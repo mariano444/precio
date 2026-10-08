@@ -1,31 +1,22 @@
-# Despliegue recomendado
+[DEPLOY.md](https://github.com/user-attachments/files/33217361/DEPLOY.md)
+# Deploy PrecioReal en Netlify
 
-## Netlify (esta versión)
+## Build
+- Base directory: vacío
+- Build command: vacío
+- Publish directory: `public`
+- Functions directory: `netlify/functions`
 
-1. Subí todo el proyecto al repositorio de GitHub.
-2. En Netlify elegí el repo.
-3. Branch: `main`.
-4. Base directory: vacío.
-5. Build command: vacío.
-6. Publish directory: `public`.
-7. Functions directory: `netlify/functions`.
-8. Deploy.
+## Variables obligatorias para Mercado Libre
+Desde el estado actual de la API de Mercado Libre, la búsqueda debe ejecutarse autenticada con OAuth. Configurá en Netlify:
 
-Variables recomendadas en Netlify:
-- `SITE_ID=MLA`
-- `MAX_RESULTS_PER_SOURCE=40`
-- `REQUEST_TIMEOUT_MS=10000`
-- `SERPER_API_KEY` (opcional, para búsquedas web adicionales)
-- `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` (recomendado para guardar alertas e histórico)
+`ML_ACCESS_TOKEN` = Access Token válido de tu aplicación de Mercado Libre.
 
-## Supabase
+El Access Token tiene una vigencia de 6 horas. Para producción conviene implementar OAuth + refresh token; esta versión ya detecta 401/403 y no oculta el error.
 
-Ejecutá `SUPABASE.sql` en el SQL Editor. La clave `SUPABASE_SERVICE_ROLE_KEY` debe estar solamente en variables de entorno del servidor/Functions.
+## Variables opcionales
+`SERPER_API_KEY` habilita descubrimiento web adicional mediante Serper.
+`SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` habilitan persistencia de búsquedas/alertas.
 
-## Local
-
-`npm start` mantiene el servidor Node tradicional.
-
-
-### Importante: solo resultados reales
-La versión actual no incluye fallback de demostración. Si las fuentes reales no devuelven publicaciones, la aplicación mostrará que no se encontraron resultados reales en lugar de inventar o simular publicaciones.
+## Resultado
+La aplicación NO tiene datos demo. Cuando una fuente falla, la UI muestra el motivo. Solo se muestran publicaciones recibidas de fuentes reales.
