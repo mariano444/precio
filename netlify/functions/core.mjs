@@ -7,7 +7,8 @@ const sources = [
   new MercadoLibreSource({
     siteId: env.SITE_ID || 'MLA',
     limit: env.MAX_RESULTS_PER_SOURCE || 40,
-    timeout: env.REQUEST_TIMEOUT_MS || 10000
+    timeout: env.REQUEST_TIMEOUT_MS || 15000,
+    accessToken: env.ML_ACCESS_TOKEN || env.MERCADOLIBRE_ACCESS_TOKEN || ''
   }),
   new SerperSource({
     apiKey: env.SERPER_API_KEY || '',
@@ -33,24 +34,40 @@ function cleanInput(body = {}) {
   };
 }
 
+function sourceConfigured(source) {
+  if (source.id === 'mercadolibre') return Boolean(env.ML_ACCESS_TOKEN || env.MERCADOLIBRE_ACCESS_TOKEN);
+  if (source.id === 'web-search') return Boolean(env.SERPER_API_KEY);
+  return true;
+}
+
 export async function performSearch(rawInput) {
   const input = cleanInput(rawInput);
   if (!input.query) throw new Error('Ingresá qué querés buscar.');
-  const results = await Promise.allSettled(
-    sources.map(s => s.search(input).catch(() => []))
-  );
+
+  const results = await Promise.allSettled(sources.map(s => s.search(input)));
   let items = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
-  const sourceHealth = sources.map((s, i) => ({
-    id: s.id,
-    name: s.name,
-    ok: results[i]?.status === 'fulfilled',
-    count: results[i]?.status === 'fulfilled' ? results[i].value.length : 0,
-    configured: s.id !== 'web-search' || !!env.SERPER_API_KEY
-  }));
+  const sourceHealth = sources.map((s, i) => {
+    const result = results[i];
+    const configured = sourceConfigured(s);
+    return {
+      id: s.id,
+      name: s.name,
+      configured,
+      ok: result?.status === 'fulfilled',
+      count: result?.status === 'fulfilled' ? result.value.length : 0,
+      error: result?.status === 'rejected' ? (result.reason?.message || 'Error de fuente') : null
+    };
+  });
 
   items = dedupe(items);
   const analysis = analyze(items, input);
-  return { input, generatedAt: new Date().toISOString(), sourceHealth, ...analysis };
+  return {
+    input,
+    generatedAt: new Date().toISOString(),
+    sourceHealth,
+    realDataOnly: true,
+    ...analysis
+  };
 }
 
 export function json(statusCode, body, extraHeaders = {}) {
