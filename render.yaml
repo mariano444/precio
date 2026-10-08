@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: precio-real
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: ENABLE_DEMO_FALLBACK
+        value: "true"
+      - key: SITE_ID
+        value: MLA
+      - key: MAX_RESULTS_PER_SOURCE
+        value: "40"
+      - key: REQUEST_TIMEOUT_MS
+        value: "10000"
+      - key: SERPER_API_KEY
+        sync: false
