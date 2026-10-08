@@ -1,0 +1,28 @@
+[
+  {
+    "id": "muztitgi-cptcnggt",
+    "query": "Toyota Corolla 2021",
+    "location": "Cordoba",
+    "category": "autos",
+    "mode": "buy",
+    "maxPrice": 25000000,
+    "year": 2021,
+    "km": null,
+    "createdAt": "2026-10-08T17:36:23.202Z",
+    "resultCount": 10,
+    "median": 23745000
+  },
+  {
+    "id": "muzths0s-dj0crnzd",
+    "query": "Toyota Corolla 2021",
+    "location": "Córdoba",
+    "category": "autos",
+    "mode": "buy",
+    "maxPrice": 25000000,
+    "year": 2021,
+    "km": null,
+    "createdAt": "2026-10-08T17:35:34.684Z",
+    "resultCount": 10,
+    "median": 23745000
+  }
+]
